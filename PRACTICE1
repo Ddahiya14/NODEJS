@@ -1,0 +1,157 @@
+const readline = require('readline');
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
+let employees = [];
+
+function showMenu() {
+  console.log(`
+========= Employee Management System =========
+
+1. Add Employee
+2. List Employees
+3. Remove Employee
+4. Update Employee
+5. Search Employee
+6. Show Total Employees
+7. Exit
+
+==============================================
+  `);
+  rl.question('Choose an option (1-7): ', handleMenu);
+}
+
+function handleMenu(option) {
+  switch (option.trim()) {
+    case '1':
+      addEmployee();
+      break;
+    case '2':
+      listEmployees();
+      break;
+    case '3':
+      removeEmployee();
+      break;
+    case '4':
+      updateEmployee();
+      break;
+    case '5':
+      searchEmployee();
+      break;
+    case '6':
+      console.log(`\n📊 Total Employees: ${employees.length}\n`);
+      showMenu();
+      break;
+    case '7':
+      console.log('👋 Exiting... Goodbye!');
+      rl.close();
+      break;
+    default:
+      console.log('❌ Invalid option. Please choose between 1 and 7.');
+      showMenu();
+  }
+}
+
+function addEmployee() {
+  rl.question('Enter Employee Name: ', (name) => {
+    rl.question('Enter Employee ID: ', (id) => {
+      name = name.trim();
+      id = id.trim();
+
+      if (!name || !id) {
+        console.log('❌ Name and ID cannot be empty.');
+        return showMenu();
+      }
+
+      const exists = employees.find(emp => emp.id === id);
+      if (exists) {
+        console.log(`❌ Employee with ID ${id} already exists.`);
+        return showMenu();
+      }
+
+      employees.push({ id, name });
+      console.log('✅ Employee added successfully!');
+      showMenu();
+    });
+  });
+}
+
+function listEmployees() {
+  if (employees.length === 0) {
+    console.log('📭 No employees to display.\n');
+  } else {
+    console.log('\n📋 Employee List:\n-------------------------');
+    employees.forEach(emp => {
+      console.log(`🆔 ID: ${emp.id} | 👤 Name: ${emp.name}`);
+    });
+    console.log('-------------------------\n');
+  }
+  showMenu();
+}
+
+function removeEmployee() {
+  rl.question('Enter Employee ID to remove: ', (id) => {
+    id = id.trim();
+    const index = employees.findIndex(emp => emp.id === id);
+
+    if (index === -1) {
+      console.log(`❌ Employee with ID ${id} not found.`);
+    } else {
+      employees.splice(index, 1);
+      console.log(`🗑️ Employee with ID ${id} removed.`);
+    }
+
+    showMenu();
+  });
+}
+
+function updateEmployee() {
+  rl.question('Enter Employee ID to update: ', (id) => {
+    id = id.trim();
+    const emp = employees.find(emp => emp.id === id);
+
+    if (!emp) {
+      console.log(`❌ Employee with ID ${id} not found.`);
+      return showMenu();
+    }
+
+    rl.question('Enter new name: ', (newName) => {
+      newName = newName.trim();
+      if (!newName) {
+        console.log('❌ Name cannot be empty.');
+      } else {
+        emp.name = newName;
+        console.log('✅ Employee updated successfully!');
+      }
+      showMenu();
+    });
+  });
+}
+
+function searchEmployee() {
+  rl.question('Enter Employee ID or Name to search: ', (input) => {
+    input = input.trim().toLowerCase();
+    const results = employees.filter(emp =>
+      emp.id.toLowerCase() === input ||
+      emp.name.toLowerCase().includes(input)
+    );
+
+    if (results.length === 0) {
+      console.log('🔍 No matching employee found.');
+    } else {
+      console.log('\n🔎 Search Results:\n-------------------------');
+      results.forEach(emp => {
+        console.log(`🆔 ID: ${emp.id} | 👤 Name: ${emp.name}`);
+      });
+      console.log('-------------------------\n');
+    }
+
+    showMenu();
+  });
+}
+
+console.log('👨‍💼 Welcome to the Employee Management System!');
+showMenu();
